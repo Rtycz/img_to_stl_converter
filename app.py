@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -15,19 +16,22 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_photo():
     if 'photo' not in request.files:
-        return redirect(url_for('index'))
+        return 'No photo part'
 
     photo = request.files['photo']
 
     if photo.filename == '':
-        return redirect(url_for('index'))
+        return 'No selected file'
 
     if photo:
-        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
+        # Generate a prefix based on the current date and time
+        prefix = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f")[:-4]  # Truncate to 2 decimal places for milliseconds
+        filename = f"{prefix}_{photo.filename}"
+        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         photo.save(photo_path)
-        return f'Photo uploaded successfully! <a href="{url_for("static", filename="uploads/" + photo.filename)}">View Photo</a>'
+        return 'Photo uploaded successfully!'
 
-    return redirect(url_for('index'))
+    return 'Upload failed'
 
 if __name__ == '__main__':
     app.run(debug=True)
