@@ -37,19 +37,35 @@ def upload_photo():
         photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         photo.save(photo_path)
 
-        # Обработка изображения
+        # Обработка изображения с параметрами по умолчанию
         processed_filename = process_image(photo_path, filename)
 
         return jsonify({'message': 'Photo uploaded and processed successfully!', 'filename': filename, 'processed_filename': processed_filename})
 
     return jsonify({'error': 'Upload failed'}), 500
 
-def process_image(photo_path, filename):
+@app.route('/process-image', methods=['POST'])
+def process_image_with_params():
+    data = request.get_json()
+    filename = data.get('filename')
+    maxValue = int(data.get('maxValue', 255))
+    adaptiveMethod = data.get('adaptiveMethod', 'ADAPTIVE_THRESH_GAUSSIAN_C')
+    thresholdType = data.get('thresholdType', 'THRESH_BINARY')
+    blockSize = int(data.get('blockSize', 11))
+    C = int(data.get('C', 2))
+
+    photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    processed_filename = process_image(photo_path, filename, maxValue, adaptiveMethod, thresholdType, blockSize, C)
+
+    return jsonify({'processed_filename': processed_filename})
+
+def process_image(photo_path, filename, maxValue=255, adaptiveMethod='ADAPTIVE_THRESH_GAUSSIAN_C', thresholdType='THRESH_BINARY', blockSize=11, C=2):
     # Чтение изображения
     image = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
     # Применение адаптивного порога
-    processed_image = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                             cv2.THRESH_BINARY, 11, 2)
+    adaptive_method = getattr(cv2, adaptiveMethod)
+    threshold_type = getattr(cv2, thresholdType)
+    processed_image = cv2.adaptiveThreshold(image, maxValue, adaptive_method, threshold_type, blockSize, C)
     # Сохранение обработанного изображения
     processed_filename = f"processed_{filename}"
     processed_path = os.path.join(app.config['PROCESSED_FOLDER'], processed_filename)
