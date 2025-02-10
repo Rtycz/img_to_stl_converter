@@ -5,22 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Photo</title>
     <style>
+        /* Стили для градиентного фона */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #89CFF0 10%, #005FCC 100%);
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
         /* Стили для превью изображения */
         #preview {
-            width: 25%;
-            margin-left: 20px;
+            width: 35%;
+            margin: 20px auto;
             display: none;
             position: relative;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
         }
+
         #preview img {
             width: 100%;
             height: auto;
             display: block;
+            border-radius: 8px;
         }
+
         /* Стили для индикатора загрузки */
         .loader {
-            border: 16px solid #f3f3f3;
-            border-top: 16px solid #3498db;
+            border: 16px solid rgba(255, 255, 255, 0.3);
+            border-top: 16px solid #fff;
             border-radius: 50%;
             width: 120px;
             height: 120px;
@@ -30,20 +55,49 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Стили для кнопки выбора файла */
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="file"]::file-selector-button {
+            border: 2px solid #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
         }
     </style>
     <!-- Подключение внешнего JavaScript-файла -->
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
-    <h1>Upload a Photo</h1>
-    <input type="file" id="photoInput" name="photo" accept="image/*"><br><br>
-    <div id="preview">
-        <div class="loader" id="loader"></div>
-        <img id="previewImage" src="" alt="Image Preview">
+    <div>
+        <h1>Upload a Photo</h1>
+        <input type="file" id="photoInput" name="photo" accept="image/*">
+        <div id="preview">
+            <div class="loader" id="loader"></div>
+            <img id="previewImage" src="" alt="Image Preview">
+        </div>
     </div>
 </body>
 </html>
