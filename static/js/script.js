@@ -6,10 +6,20 @@ document.getElementById('photoInput').addEventListener('change', function(event)
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
+        const preview = document.getElementById('preview');
+        const loader = document.getElementById('loader');
+        const previewImage = document.getElementById('previewImage');
+
+        // Показать индикатор загрузки
+        loader.style.display = 'block';
+        preview.style.display = 'block';
+        previewImage.style.display = 'none';
+
         reader.onload = function(e) {
-            // Отображение превью изображения
-            document.getElementById('previewImage').src = e.target.result;
-            document.getElementById('preview').style.display = 'block';
+            // Отображение превью изображения после загрузки
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+            loader.style.display = 'none';
         };
         reader.readAsDataURL(file);
 
