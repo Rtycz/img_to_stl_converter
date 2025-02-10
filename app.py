@@ -15,19 +15,19 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_photo():
     if 'photo' not in request.files:
-        return redirect(url_for('index'))
+        return 'No photo part'
 
     photo = request.files['photo']
 
     if photo.filename == '':
-        return redirect(url_for('index'))
+        return 'No selected file'
 
     if photo:
         photo_path = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
         photo.save(photo_path)
-        return f'Photo uploaded successfully! <a href="{url_for("static", filename="uploads/" + photo.filename)}">View Photo</a>'
+        return 'Photo uploaded successfully!'
 
-    return redirect(url_for('index'))
+    return 'Upload failed'
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -4,12 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Photo</title>
+    <style>
+        #preview {
+            width: 25%;
+            margin-left: 20px;
+            display: none;
+        }
+        #preview img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <h1>Upload a Photo</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="photo" accept="image/*"><br><br>
-        <input type="submit" value="Upload">
-    </form>
+    <input type="file" id="photoInput" name="photo" accept="image/*"><br><br>
+    <div id="preview">
+        <img id="previewImage" src="" alt="Image Preview">
+    </div>
+
+    <script>
+        document.getElementById('photoInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+
+                // Create a FormData object and append the file
+                const formData = new FormData();
+                formData.append('photo', file);
+
+                // Send the file to the server using fetch
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.text())
+                  .then(data => {
+                      console.log(data); // Handle server response if needed
+                  }).catch(error => {
+                      console.error('Error uploading the photo:', error);
+                  });
+            }
+        });
+    </script>
 </body>
 </html>
