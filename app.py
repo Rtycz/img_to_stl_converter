@@ -37,17 +37,17 @@ def upload_photo():
     return jsonify({'error': 'Upload failed'}), 500
 
 @app.route('/delete', methods=['POST'])
-def delete_photo():
+def delete_photos():
     data = request.get_json()
-    filename = data.get('filename')
-    if filename:
+    filenames = data.get('filenames', [])
+    for filename in filenames:
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         if os.path.exists(file_path):
             os.remove(file_path)
-            return 'Photo deleted successfully!'
+            print(f"Deleted {filename}")
         else:
-            return 'File not found!', 404
-    return 'Bad request!', 400
+            print(f"File {filename} not found!")
+    return 'Photos deleted successfully!'
 
 def cleanup_old_files():
     """Удаление файлов, которые старше установленного времени жизни."""
@@ -73,4 +73,4 @@ def start_cleanup_thread():
 
 if __name__ == '__main__':
     start_cleanup_thread()  # Запуск фонового потока для очистки
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)

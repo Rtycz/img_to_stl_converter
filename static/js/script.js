@@ -1,6 +1,6 @@
 // static/js/scripts.js
 
-let uploadedFilename = ''; // Переменная для хранения имени загруженного файла
+let uploadedFilenames = []; // Список для хранения имен загруженных файлов
 
 document.getElementById('photoInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -23,23 +23,23 @@ document.getElementById('photoInput').addEventListener('change', function(event)
             body: formData
         }).then(response => response.json())
           .then(data => {
-              uploadedFilename = data.filename; // Сохранение имени загруженного файла
+              uploadedFilenames.push(data.filename); // Добавление имени файла в список
           }).catch(error => {
               console.error('Ошибка при загрузке фото:', error);
           });
     }
 });
 
-// Обработчик события beforeunload для удаления файла при закрытии вкладки
+// Обработчик события beforeunload для удаления всех файлов при закрытии вкладки
 window.addEventListener('beforeunload', function(event) {
-    if (uploadedFilename) {
-        // Уведомление сервера об удалении файла
+    if (uploadedFilenames.length > 0) {
+        // Уведомление сервера об удалении всех файлов
         fetch('/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ filename: uploadedFilename })
+            body: JSON.stringify({ filenames: uploadedFilenames })
         }).then(response => response.text())
           .then(data => {
               console.log(data);
