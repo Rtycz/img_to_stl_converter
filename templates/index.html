@@ -11,6 +11,7 @@
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -87,17 +88,33 @@
             background-color: rgba(255, 255, 255, 0.5);
         }
 
+        /* Стили для контейнера обработанного изображения */
+        #processedImageContainer {
+            margin: 20px auto;
+            display: none;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #processedImageContainer img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
         /* Медиазапросы для адаптивности */
         /* Альбомная ориентация */
         @media (orientation: landscape) {
-            #preview {
+            #preview, #processedImageContainer {
                 width: 35vw; /* 35% от ширины окна просмотра */
             }
         }
 
         /* Портретная ориентация */
         @media (orientation: portrait) {
-            #preview {
+            #preview, #processedImageContainer {
                 width: 70vw; /* 70% от ширины окна просмотра */
             }
         }
@@ -112,6 +129,9 @@
         <div id="preview">
             <div class="loader" id="loader"></div>
             <img id="previewImage" src="" alt="Image Preview">
+        </div>
+        <div id="processedImageContainer">
+            <img id="processedImage" src="" alt="Processed Image">
         </div>
     </div>
 </body>

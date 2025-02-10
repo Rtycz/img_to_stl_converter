@@ -1,4 +1,4 @@
-// static/js/scripts.js
+// static/js/script.js
 
 let uploadedFilenames = []; // Список для хранения имен загруженных файлов
 
@@ -9,11 +9,14 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         const preview = document.getElementById('preview');
         const loader = document.getElementById('loader');
         const previewImage = document.getElementById('previewImage');
+        const processedImageContainer = document.getElementById('processedImageContainer');
+        const processedImage = document.getElementById('processedImage');
 
         // Показать индикатор загрузки
         loader.style.display = 'block';
         preview.style.display = 'block';
         previewImage.style.display = 'none';
+        processedImageContainer.style.display = 'none';
 
         reader.onload = function(e) {
             // Отображение превью изображения после загрузки
@@ -34,6 +37,9 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         }).then(response => response.json())
           .then(data => {
               uploadedFilenames.push(data.filename); // Добавление имени файла в список
+              // Отображение обработанного изображения
+              processedImage.src = `/static/processed/${data.processed_filename}`;
+              processedImageContainer.style.display = 'block';
           }).catch(error => {
               console.error('Ошибка при загрузке фото:', error);
           });
