@@ -26,7 +26,6 @@
 
         /* Стили для превью изображения */
         #preview {
-            width: 35%;
             margin: 20px auto;
             display: none;
             position: relative;
@@ -71,6 +70,7 @@
             background-color: rgba(255, 255, 255, 0.2);
             color: white;
             cursor: pointer;
+            width: 80%;
         }
 
         input[type="file"]::file-selector-button {
@@ -85,6 +85,21 @@
 
         input[type="file"]::file-selector-button:hover {
             background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Медиазапросы для адаптивности */
+        /* Альбомная ориентация */
+        @media (orientation: landscape) {
+            #preview {
+                width: 35vw; /* 35% от ширины окна просмотра */
+            }
+        }
+
+        /* Портретная ориентация */
+        @media (orientation: portrait) {
+            #preview {
+                width: 70vw; /* 70% от ширины окна просмотра */
+            }
         }
     </style>
     <!-- Подключение внешнего JavaScript-файла -->
