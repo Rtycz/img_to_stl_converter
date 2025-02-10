@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -23,7 +24,10 @@ def upload_photo():
         return 'No selected file'
 
     if photo:
-        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
+        # Generate a prefix based on the current date and time
+        prefix = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f")[:-4]  # Truncate to 2 decimal places for milliseconds
+        filename = f"{prefix}_{photo.filename}"
+        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         photo.save(photo_path)
         return 'Photo uploaded successfully!'
 
