@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+import threading
+import time
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_AGE'] = timedelta(minutes=30)  # Установите время жизни файла
 
-# Ensure the upload folder exists
+# Убедитесь, что папка для загрузок существует
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
@@ -16,22 +19,58 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_photo():
     if 'photo' not in request.files:
-        return 'No photo part'
+        return jsonify({'error': 'No photo part'}), 400
 
     photo = request.files['photo']
 
     if photo.filename == '':
-        return 'No selected file'
+        return jsonify({'error': 'No selected file'}), 400
 
     if photo:
-        # Generate a prefix based on the current date and time
-        prefix = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f")[:-4]  # Truncate to 2 decimal places for milliseconds
+        # Генерация префикса на основе текущей даты и времени
+        prefix = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f")[:-4]
         filename = f"{prefix}_{photo.filename}"
         photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         photo.save(photo_path)
-        return 'Photo uploaded successfully!'
+        return jsonify({'message': 'Photo uploaded successfully!', 'filename': filename})
 
-    return 'Upload failed'
+    return jsonify({'error': 'Upload failed'}), 500
+
+@app.route('/delete', methods=['POST'])
+def delete_photos():
+    data = request.get_json()
+    filenames = data.get('filenames', [])
+    for filename in filenames:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"Deleted {filename}")
+        else:
+            print(f"File {filename} not found!")
+    return 'Photos deleted successfully!'
+
+def cleanup_old_files():
+    """Удаление файлов, которые старше установленного времени жизни."""
+    now = datetime.now()
+    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.isfile(file_path):
+            file_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+            if now - file_time > app.config['MAX_AGE']:
+                os.remove(file_path)
+                print(f"Deleted {filename}")
+
+def start_cleanup_thread():
+    """Запуск фонового потока для периодической очистки старых файлов."""
+    def run_cleanup():
+        while True:
+            cleanup_old_files()
+            time.sleep(app.config['MAX_AGE'].total_seconds())
+
+    thread = threading.Thread(target=run_cleanup)
+    thread.daemon = True
+    thread.start()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    start_cleanup_thread()  # Запуск фонового потока для очистки
+    app.run(host='0.0.0.0', port=5000, debug=True)

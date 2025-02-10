@@ -5,51 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Photo</title>
     <style>
+        /* Стили для превью изображения */
         #preview {
             width: 25%;
             margin-left: 20px;
             display: none;
+            position: relative;
         }
         #preview img {
             width: 100%;
             height: auto;
+            display: block;
+        }
+        /* Стили для индикатора загрузки */
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
+    <!-- Подключение внешнего JavaScript-файла -->
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
     <h1>Upload a Photo</h1>
     <input type="file" id="photoInput" name="photo" accept="image/*"><br><br>
     <div id="preview">
+        <div class="loader" id="loader"></div>
         <img id="previewImage" src="" alt="Image Preview">
     </div>
-
-    <script>
-        document.getElementById('photoInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImage').src = e.target.result;
-                    document.getElementById('preview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-
-                // Create a FormData object and append the file
-                const formData = new FormData();
-                formData.append('photo', file);
-
-                // Send the file to the server using fetch
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                }).then(response => response.text())
-                  .then(data => {
-                      console.log(data); // Handle server response if needed
-                  }).catch(error => {
-                      console.error('Error uploading the photo:', error);
-                  });
-            }
-        });
-    </script>
 </body>
 </html>
