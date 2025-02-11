@@ -26,17 +26,16 @@ h1 {
 }
 
 /* Стили для превью изображения */
-#preview {
+.preview-container {
     margin: 20px auto;
     display: none;
     position: relative;
     border: 2px solid #fff;
     border-radius: 10px;
     overflow: hidden;
-    max-width: 100%;
 }
 
-#preview img {
+.preview-container img {
     width: 100%;
     height: auto;
     display: block;
@@ -72,7 +71,6 @@ input[type="file"] {
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
     cursor: pointer;
-    width: 80%;
     max-width: 600px;
 }
 
@@ -91,16 +89,15 @@ input[type="file"]::file-selector-button:hover {
 }
 
 /* Стили для контейнера обработанного изображения */
-#processedImageContainer {
+.processed-image-container {
     margin: 20px auto;
     display: none;
     border: 2px solid #fff;
     border-radius: 10px;
     overflow: hidden;
-    max-width: 100%;
 }
 
-#processedImageContainer img {
+.processed-image-container img {
     width: 100%;
     height: auto;
     display: block;
@@ -108,41 +105,83 @@ input[type="file"]::file-selector-button:hover {
 }
 
 /* Стили для элементов управления */
-.controls {
-    margin: 20px auto;
+.controls-container {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    width: 100%;
-    max-width: 600px;
 }
 
-.controls label {
-    margin: 5px 0; /* Уменьшено расстояние между ползунками */
+.controls-container label {
+    flex: 1;
+    flex-direction: column;
+    align-items: center; /* Выравнивание по центру по горизонтали */
+    margin: 5px 0;
     font-size: 1em;
 }
 
-.controls input[type="range"], .controls select {
-    margin: 5px 0; /* Уменьшено расстояние между ползунками */
-    width: 100%;
+.controls-container input[type="range"], .controls-container select {
+    margin: 5px 0;
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #fff;
     background-color: rgba(255, 255, 255, 0.2);
-    color: white;
+    color: black;
+    width: 90% !important;
 }
 
 /* Медиазапросы для адаптивности */
-/* Альбомная ориентация */
-@media (orientation: landscape) {
-    #preview, #processedImageContainer {
+/* Портретная ориентация */
+@media (orientation: portrait) {
+    .preview-container, .processed-image-container {
         width: 35vw; /* 35% от ширины окна просмотра */
+    }
+
+    .controls-container {
+        width: 70vw; /* 70% от ширины окна просмотра */
+        flex-direction: column;
+    }
+
+    .controls-container .row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .controls-container .row select, .controls-container .row input[type="range"] {
+        width: 45%;
     }
 }
 
-/* Портретная ориентация */
-@media (orientation: portrait) {
-    #preview, #processedImageContainer {
-        width: 70vw; /* 70% от ширины окна просмотра */
+/* Альбомная ориентация */
+@media (orientation: landscape) {
+    .preview-container, .processed-image-container {
+        width: 35vw; /* 35% от ширины окна просмотра */
+    }
+
+    .controls-container {
+        width: 45vw; /* 45% от ширины окна просмотра */
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .controls-container .row {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+
+    .controls-container .row select, .controls-container .row input[type="range"] {
+        width: 100%;
+    }
+
+    .controls-container .column {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .controls-container .column input[type="range"], .controls-container .column select {
+        width: 100%;
     }
 }
