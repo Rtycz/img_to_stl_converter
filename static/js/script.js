@@ -28,10 +28,10 @@ document.getElementById('photoInput').addEventListener('change', function(event)
 
         // Создание объекта FormData и добавление файла
         const formData = new FormData();
-        formData.append('photo', file);
+        formData.append('file', file);
 
         // Отправка файла на сервер с использованием fetch
-        fetch('/upload', {
+        fetch('/upload/', {
             method: 'POST',
             body: formData
         }).then(response => response.json())
@@ -49,12 +49,12 @@ document.getElementById('photoInput').addEventListener('change', function(event)
 window.addEventListener('beforeunload', function(event) {
     if (uploadedFilenames.length > 0) {
         // Уведомление сервера об удалении всех файлов
-        fetch('/delete', {
+        fetch('/delete/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify({ filenames: uploadedFilenames })
+            body: new URLSearchParams({ filenames: uploadedFilenames })
         }).then(response => response.text())
           .then(data => {
               console.log(data);
@@ -72,7 +72,7 @@ function updateProcessedImage(filename) {
     const blockSize = document.getElementById('blockSize').value;
     const C = document.getElementById('C').value;
 
-    fetch('/process-image', {
+    fetch('/process-image/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
