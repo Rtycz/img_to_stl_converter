@@ -1,4 +1,4 @@
-// static/js/scripts.js
+// static/js/script.js
 
 let uploadedFilenames = []; // Список для хранения имен загруженных файлов
 
@@ -9,11 +9,14 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         const preview = document.getElementById('preview');
         const loader = document.getElementById('loader');
         const previewImage = document.getElementById('previewImage');
+        const processedImageContainer = document.getElementById('processedImageContainer');
+        const processedImage = document.getElementById('processedImage');
 
         // Показать индикатор загрузки
         loader.style.display = 'block';
         preview.style.display = 'block';
         previewImage.style.display = 'none';
+        processedImageContainer.style.display = 'none';
 
         reader.onload = function(e) {
             // Отображение превью изображения после загрузки
@@ -34,6 +37,8 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         }).then(response => response.json())
           .then(data => {
               uploadedFilenames.push(data.filename); // Добавление имени файла в список
+              // Отображение обработанного изображения
+              updateProcessedImage(data.filename);
           }).catch(error => {
               console.error('Ошибка при загрузке фото:', error);
           });
@@ -58,3 +63,49 @@ window.addEventListener('beforeunload', function(event) {
           });
     }
 });
+
+// Функция для обновления обработанного изображения
+function updateProcessedImage(filename) {
+    const maxValue = document.getElementById('maxValue').value;
+    const adaptiveMethod = document.getElementById('adaptiveMethod').value;
+    const thresholdType = document.getElementById('thresholdType').value;
+    const blockSize = document.getElementById('blockSize').value;
+    const C = document.getElementById('C').value;
+
+    fetch('/process-image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            filename,
+            maxValue,
+            adaptiveMethod,
+            thresholdType,
+            blockSize,
+            C
+        })
+    }).then(response => response.json())
+      .then(data => {
+          const processedImage = document.getElementById('processedImage');
+          const processedImageContainer = document.getElementById('processedImageContainer');
+          processedImage.src = `/static/processed/${data.processed_filename}?t=${new Date().getTime()}`;
+          processedImageContainer.style.display = 'block';
+      }).catch(error => {
+          console.error('Ошибка при обработке изображения:', error);
+      });
+}
+
+// Обработчики изменения параметров
+document.getElementById('maxValue').addEventListener('input', updateProcessedImageWithCurrentFilename);
+document.getElementById('adaptiveMethod').addEventListener('change', updateProcessedImageWithCurrentFilename);
+document.getElementById('thresholdType').addEventListener('change', updateProcessedImageWithCurrentFilename);
+document.getElementById('blockSize').addEventListener('input', updateProcessedImageWithCurrentFilename);
+document.getElementById('C').addEventListener('input', updateProcessedImageWithCurrentFilename);
+
+function updateProcessedImageWithCurrentFilename() {
+    if (uploadedFilenames.length > 0) {
+        const currentFilename = uploadedFilenames[uploadedFilenames.length - 1];
+        updateProcessedImage(currentFilename);
+    }
+}
