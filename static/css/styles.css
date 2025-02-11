@@ -118,12 +118,12 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .controls label {
-    margin: 10px;
+    margin: 5px 0; /* Уменьшено расстояние между ползунками */
     font-size: 1em;
 }
 
 .controls input[type="range"], .controls select {
-    margin: 10px;
+    margin: 5px 0; /* Уменьшено расстояние между ползунками */
     width: 100%;
     padding: 5px;
     border-radius: 5px;
