@@ -5,7 +5,6 @@ from fastapi.templating import Jinja2Templates
 from typing import List
 import os
 import cv2
-import numpy as np
 from datetime import datetime, timedelta
 import threading
 import time
