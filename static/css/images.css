@@ -1,0 +1,17 @@
+/* static/css/images.css */
+
+.preview-container, .processed-image-container {
+    margin: 20px auto;
+    display: none;
+    position: relative;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.preview-container img, .processed-image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}

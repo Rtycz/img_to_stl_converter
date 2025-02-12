@@ -28,10 +28,10 @@ document.getElementById('photoInput').addEventListener('change', function(event)
 
         // Создание объекта FormData и добавление файла
         const formData = new FormData();
-        formData.append('photo', file);
+        formData.append('file', file);
 
         // Отправка файла на сервер с использованием fetch
-        fetch('/upload', {
+        fetch('/api/v1/image', {
             method: 'POST',
             body: formData
         }).then(response => response.json())
@@ -49,12 +49,12 @@ document.getElementById('photoInput').addEventListener('change', function(event)
 window.addEventListener('beforeunload', function(event) {
     if (uploadedFilenames.length > 0) {
         // Уведомление сервера об удалении всех файлов
-        fetch('/delete', {
-            method: 'POST',
+        fetch('/api/v1/image', {
+            method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify({ filenames: uploadedFilenames })
+            body: new URLSearchParams({ filenames: uploadedFilenames })
         }).then(response => response.text())
           .then(data => {
               console.log(data);
@@ -72,7 +72,7 @@ function updateProcessedImage(filename) {
     const blockSize = document.getElementById('blockSize').value;
     const C = document.getElementById('C').value;
 
-    fetch('/process-image', {
+    fetch('/api/v1/process/adaptive-threshold', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ function updateProcessedImage(filename) {
       .then(data => {
           const processedImage = document.getElementById('processedImage');
           const processedImageContainer = document.getElementById('processedImageContainer');
-          processedImage.src = `/static/processed/${data.processed_filename}?t=${new Date().getTime()}`;
+          processedImage.src = `/static/images/${data.processed_filename}?t=${new Date().getTime()}`;
           processedImageContainer.style.display = 'block';
       }).catch(error => {
           console.error('Ошибка при обработке изображения:', error);

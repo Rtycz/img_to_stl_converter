@@ -1,0 +1,54 @@
+/* static/css/responsive.css */
+
+@media (orientation: portrait) {
+    .preview-container, .processed-image-container {
+        width: 35vw;
+    }
+
+    .controls-container {
+        width: 70vw;
+        flex-direction: column;
+    }
+
+    .controls-container .row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .controls-container .row select, .controls-container .row input[type="range"] {
+        width: 45%;
+    }
+}
+
+@media (orientation: landscape) {
+    .preview-container, .processed-image-container {
+        width: 35vw;
+    }
+
+    .controls-container {
+        width: 45vw;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .controls-container .row {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+
+    .controls-container .row select, .controls-container .row input[type="range"] {
+        width: 100%;
+    }
+
+    .controls-container .column {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .controls-container .column input[type="range"], .controls-container .column select {
+        width: 100%;
+    }
+}
