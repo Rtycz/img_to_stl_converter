@@ -89,7 +89,7 @@ function updateProcessedImage(filename) {
       .then(data => {
           const processedImage = document.getElementById('processedImage');
           const processedImageContainer = document.getElementById('processedImageContainer');
-          processedImage.src = `/static/processed/${data.processed_filename}?t=${new Date().getTime()}`;
+          processedImage.src = `/static/images/${data.processed_filename}?t=${new Date().getTime()}`;
           processedImageContainer.style.display = 'block';
       }).catch(error => {
           console.error('Ошибка при обработке изображения:', error);

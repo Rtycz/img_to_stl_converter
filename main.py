@@ -11,14 +11,13 @@ import time
 
 app = FastAPI()
 
-# Убедитесь, что папки для загрузок и обработанных файлов существуют
-os.makedirs("static/uploads", exist_ok=True)
-os.makedirs("static/processed", exist_ok=True)
+# Убедитесь, что папка для загрузок существует
+os.makedirs("static/images", exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-@app.get("/", response_class=FileResponse)
+@app.get("/", response_class=templates.TemplateResponse)
 async def read_index():
     return templates.TemplateResponse("index.html", {"request": {}})
 
@@ -34,7 +33,7 @@ async def upload_photo(file: UploadFile = File(...)):
     # Генерация префикса на основе текущей даты и времени
     prefix = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f")[:-4]
     filename = f"{prefix}_{filename}"
-    file_path = os.path.join("static/uploads", filename)
+    file_path = os.path.join("static/images", filename)
 
     with open(file_path, "wb") as f:
         f.write(await file.read())
@@ -57,7 +56,7 @@ async def process_image_with_params(data: dict):
     blockSize = int(data.get("blockSize", 11))
     C = int(data.get("C", 2))
 
-    photo_path = os.path.join("static/uploads", filename)
+    photo_path = os.path.join("static/images", filename)
     processed_filename = process_image(photo_path, filename, maxValue, adaptiveMethod, thresholdType, blockSize, C)
 
     return JSONResponse({"processed_filename": processed_filename})
@@ -70,16 +69,16 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     threshold_type = getattr(cv2, thresholdType)
     processed_image = cv2.adaptiveThreshold(image, maxValue, adaptive_method, threshold_type, blockSize, C)
     # Сохранение обработанного изображения
-    processed_filename = f"processed_{filename}"
-    processed_path = os.path.join("static/processed", processed_filename)
+    processed_filename = f"{filename.split('.')[0]}_processed.png"
+    processed_path = os.path.join("static/images", processed_filename)
     cv2.imwrite(processed_path, processed_image)
     return processed_filename
 
 @app.post("/delete/")
 async def delete_photos(filenames: List[str] = Form(...)):
     for filename in filenames:
-        file_path = os.path.join("static/uploads", filename)
-        processed_path = os.path.join("static/processed", f"processed_{filename}")
+        file_path = os.path.join("static/images", filename)
+        processed_path = os.path.join("static/images", f"{filename.split('.')[0]}_processed.png")
         if os.path.exists(file_path):
             os.remove(file_path)
         if os.path.exists(processed_path):
@@ -89,7 +88,7 @@ async def delete_photos(filenames: List[str] = Form(...)):
 def cleanup_old_files():
     """Удаление файлов, которые старше установленного времени жизни."""
     now = datetime.now()
-    for folder in ["static/uploads", "static/processed"]:
+    for folder in ["static/images"]:
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
             if os.path.isfile(file_path):
