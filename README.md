@@ -8,3 +8,5 @@ pip install Jinja2 <br>
 pip install python-multipart <br>
 
 **run app with:** uvicorn main:app --reload
+
+**clear venv** pip freeze | ForEach-Object { pip uninstall -y $_ }
