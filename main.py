@@ -57,7 +57,8 @@ async def upload_photo(file: UploadFile = File(...)):
 
 @app.delete("/api/v1/image")
 async def delete_photos(filenames: List[str] = Form(...)):
-    for filename in filenames:
+    """input like ['13_02_2025_00_11_40_83_asd.png,13_02_2025_00_11_43_58_bsd.png']"""
+    for filename in filenames[0].split(','):
         file_path = os.path.join("static/images", filename)
         processed_path = os.path.join("static/images", f"{filename.split('.')[0]}_processed.png")
         if os.path.exists(file_path):
