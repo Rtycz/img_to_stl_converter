@@ -1,0 +1,25 @@
+/* static/css/base.css */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #89CFF0 10%, #005FCC 100%);
+    color: white;
+    text-align: center;
+    overflow-y: auto;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
