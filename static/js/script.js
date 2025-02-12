@@ -31,7 +31,7 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         formData.append('file', file);
 
         // Отправка файла на сервер с использованием fetch
-        fetch('/upload/', {
+        fetch('/api/v1/image', {
             method: 'POST',
             body: formData
         }).then(response => response.json())
@@ -49,8 +49,8 @@ document.getElementById('photoInput').addEventListener('change', function(event)
 window.addEventListener('beforeunload', function(event) {
     if (uploadedFilenames.length > 0) {
         // Уведомление сервера об удалении всех файлов
-        fetch('/delete/', {
-            method: 'POST',
+        fetch('/api/v1/image', {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -72,7 +72,7 @@ function updateProcessedImage(filename) {
     const blockSize = document.getElementById('blockSize').value;
     const C = document.getElementById('C').value;
 
-    fetch('/process-image/', {
+    fetch('/api/v1/process/adaptive-threshold', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

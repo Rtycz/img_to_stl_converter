@@ -17,16 +17,18 @@ os.makedirs("static/images", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/", response_class=templates.TemplateResponse)
 async def read_index():
     return templates.TemplateResponse("index.html", {"request": {}})
+
 
 @app.get("/adaptiveThreshold", response_class=templates.TemplateResponse)
 async def read_adaptive_threshold():
     return templates.TemplateResponse("adaptiveThreshold.html", {"request": {}})
 
 
-@app.post("/upload/")
+@app.post("/api/v1/image")
 async def upload_photo(file: UploadFile = File(...)):
     if not file:
         raise HTTPException(status_code=400, detail="No photo part")
@@ -52,7 +54,20 @@ async def upload_photo(file: UploadFile = File(...)):
         "processed_filename": processed_filename
     })
 
-@app.post("/process-image/")
+
+@app.delete("/api/v1/image")
+async def delete_photos(filenames: List[str] = Form(...)):
+    for filename in filenames:
+        file_path = os.path.join("static/images", filename)
+        processed_path = os.path.join("static/images", f"{filename.split('.')[0]}_processed.png")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        if os.path.exists(processed_path):
+            os.remove(processed_path)
+    return "Photos deleted successfully!"
+
+
+@app.post("/api/v1/process/adaptive-threshold")
 async def process_image_with_params(data: dict):
     filename = data.get("filename")
     maxValue = int(data.get("maxValue", 255))
@@ -65,6 +80,7 @@ async def process_image_with_params(data: dict):
     processed_filename = process_image(photo_path, filename, maxValue, adaptiveMethod, thresholdType, blockSize, C)
 
     return JSONResponse({"processed_filename": processed_filename})
+
 
 def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_THRESH_GAUSSIAN_C", thresholdType="THRESH_BINARY", blockSize=11, C=2):
     # Чтение изображения
@@ -79,16 +95,6 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     cv2.imwrite(processed_path, processed_image)
     return processed_filename
 
-@app.post("/delete/")
-async def delete_photos(filenames: List[str] = Form(...)):
-    for filename in filenames:
-        file_path = os.path.join("static/images", filename)
-        processed_path = os.path.join("static/images", f"{filename.split('.')[0]}_processed.png")
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        if os.path.exists(processed_path):
-            os.remove(processed_path)
-    return "Photos deleted successfully!"
 
 def cleanup_old_files():
     """Удаление файлов, которые старше установленного времени жизни."""
@@ -102,6 +108,7 @@ def cleanup_old_files():
                     os.remove(file_path)
                     print(f"Deleted {filename}")
 
+
 def start_cleanup_thread():
     """Запуск фонового потока для периодической очистки старых файлов."""
     def run_cleanup():
@@ -112,6 +119,7 @@ def start_cleanup_thread():
     thread = threading.Thread(target=run_cleanup)
     thread.daemon = True
     thread.start()
+
 
 @app.on_event("startup")
 async def startup_event():
