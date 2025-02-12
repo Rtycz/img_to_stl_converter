@@ -1,11 +1,11 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from typing import List
 import os
 import cv2
 import numpy as np
-import shutil
 from datetime import datetime, timedelta
 import threading
 import time
@@ -17,6 +17,11 @@ os.makedirs("static/uploads", exist_ok=True)
 os.makedirs("static/processed", exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=FileResponse)
+async def read_index():
+    return templates.TemplateResponse("index.html", {"request": {}})
 
 @app.post("/upload/")
 async def upload_photo(file: UploadFile = File(...)):
