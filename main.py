@@ -21,6 +21,11 @@ templates = Jinja2Templates(directory="templates")
 async def read_index():
     return templates.TemplateResponse("index.html", {"request": {}})
 
+@app.get("/adaptiveThreshold", response_class=templates.TemplateResponse)
+async def read_adaptive_threshold():
+    return templates.TemplateResponse("adaptiveThreshold.html", {"request": {}})
+
+
 @app.post("/upload/")
 async def upload_photo(file: UploadFile = File(...)):
     if not file:
