@@ -89,9 +89,9 @@ async def process_image_with_params(data: dict):
 
 @app.post("/api/v1/process/stl-convert")
 async def convert_to_stl(data: dict):
-    filename = data.get("filename")
-    photo_path = os.path.join("static/images", filename)
-    stl_filename = convert_image_to_stl(photo_path, filename)
+    processed_filename = data.get("processed_filename")
+    photo_path = os.path.join("static/images", processed_filename)
+    stl_filename = convert_image_to_stl(photo_path, processed_filename)
 
     return JSONResponse({"stl_filename": stl_filename})
 
@@ -110,10 +110,8 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     return processed_filename
 
 
-def convert_image_to_stl(image_path, filename, height_white=0, height_black=2, scale=1.0):
-    # Открытие изображения
-    image = Image.open(image_path).convert('L')  # Преобразование в оттенки серого
-    image_array = np.array(image)
+def convert_image_to_stl(image_path, filename, height_white=0, height_black=4, scale=1.0):
+    image_array = np.array(Image.open(image_path))
 
     # Создание высотной карты
     height_map = np.where(image_array == 255, height_white, height_black)
