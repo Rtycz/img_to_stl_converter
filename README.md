@@ -6,6 +6,7 @@ pip install fastapi uvicorn <br>
 pip install opencv-python-headless <br>
 pip install Jinja2 <br>
 pip install python-multipart <br>
+pip install numpy pillow numpy-stl <br>
 
 **run app with:** uvicorn main:app --reload
 
