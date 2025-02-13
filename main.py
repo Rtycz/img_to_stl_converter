@@ -11,6 +11,8 @@ import time
 import numpy as np
 from stl import mesh
 from PIL import Image
+import pyvista as pv
+
 
 app = FastAPI()
 
@@ -110,7 +112,8 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     return processed_filename
 
 
-def convert_image_to_stl(image_path, filename, height_white=0, height_black=4, scale=1.0):
+def convert_image_to_stl(image_path, filename, height_white=0, height_black=4, scale=1.0, target_reduction=0.5):
+    # Чтение изображения
     image_array = np.array(Image.open(image_path))
 
     # Создание высотной карты
@@ -137,16 +140,21 @@ def convert_image_to_stl(image_path, filename, height_white=0, height_black=4, s
             faces.append([v2, v1, v3])
 
     # Создание STL-меша
-    stl_mesh = mesh.Mesh(np.zeros(len(faces), dtype=mesh.Mesh.dtype))
-    for i, f in enumerate(faces):
-        for j in range(3):
-            stl_mesh.vectors[i][j] = vertices[f[j]]
+    faces = np.array(faces)
+    vertices = np.array(vertices)
 
-    # Сохранение STL-файла
-    stl_filename = f"{filename.split('.')[0]}.stl"
-    stl_path = os.path.join("static/stl", stl_filename)
-    stl_mesh.save(stl_path)
-    return stl_filename
+    # Создание PolyData объекта в pyvista
+    mesh = pv.PolyData(vertices, np.hstack([np.full((faces.shape[0], 1), 3), faces]))
+
+    # Упрощение сетки
+    simplified_mesh = mesh.decimate(target_reduction)
+
+    # Сохранение упрощенного STL-файла
+    simplified_stl_path = f"{filename.split('.')[0]}_simplified.stl"
+    simplified_mesh.save(simplified_stl_path)
+
+    return simplified_stl_path
+
 
 
 def cleanup_old_files():
