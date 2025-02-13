@@ -109,3 +109,19 @@ function updateProcessedImageWithCurrentFilename() {
         updateProcessedImage(currentFilename);
     }
 }
+
+document.getElementById('convertToStl').addEventListener('click', function() {
+    const filename = uploadedFilenames[uploadedFilenames.length - 1];
+    fetch('/api/v1/process/stl-convert', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename })
+    }).then(response => response.json())
+      .then(data => {
+          alert('STL file generated: ' + data.stl_filename);
+      }).catch(error => {
+          console.error('Ошибка при генерации STL:', error);
+      });
+});

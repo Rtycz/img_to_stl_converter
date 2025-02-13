@@ -8,11 +8,15 @@ import cv2
 from datetime import datetime, timedelta
 import threading
 import time
+import numpy as np
+from stl import mesh
+from PIL import Image
 
 app = FastAPI()
 
 # Убедитесь, что папка для загрузок существует
 os.makedirs("static/images", exist_ok=True)
+os.makedirs("static/stl", exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -83,6 +87,15 @@ async def process_image_with_params(data: dict):
     return JSONResponse({"processed_filename": processed_filename})
 
 
+@app.post("/api/v1/process/stl-convert")
+async def convert_to_stl(data: dict):
+    filename = data.get("filename")
+    photo_path = os.path.join("static/images", filename)
+    stl_filename = convert_image_to_stl(photo_path, filename)
+
+    return JSONResponse({"stl_filename": stl_filename})
+
+
 def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_THRESH_GAUSSIAN_C", thresholdType="THRESH_BINARY", blockSize=11, C=2):
     # Чтение изображения
     image = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
@@ -97,15 +110,56 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     return processed_filename
 
 
+def convert_image_to_stl(image_path, filename, height_white=0, height_black=2, scale=1.0):
+    # Открытие изображения
+    image = Image.open(image_path).convert('L')  # Преобразование в оттенки серого
+    image_array = np.array(image)
+
+    # Создание высотной карты
+    height_map = np.where(image_array == 255, height_white, height_black)
+
+    # Создание сетки
+    height, width = height_map.shape
+    vertices = []
+
+    for i in range(height):
+        for j in range(width):
+            z = height_map[i, j]
+            vertices.append([j * scale, i * scale, z])
+
+    # Создание треугольников
+    faces = []
+    for i in range(height - 1):
+        for j in range(width - 1):
+            v0 = i * width + j
+            v1 = v0 + 1
+            v2 = v0 + width
+            v3 = v2 + 1
+            faces.append([v0, v1, v2])
+            faces.append([v2, v1, v3])
+
+    # Создание STL-меша
+    stl_mesh = mesh.Mesh(np.zeros(len(faces), dtype=mesh.Mesh.dtype))
+    for i, f in enumerate(faces):
+        for j in range(3):
+            stl_mesh.vectors[i][j] = vertices[f[j]]
+
+    # Сохранение STL-файла
+    stl_filename = f"{filename.split('.')[0]}.stl"
+    stl_path = os.path.join("static/stl", stl_filename)
+    stl_mesh.save(stl_path)
+    return stl_filename
+
+
 def cleanup_old_files():
     """Удаление файлов, которые старше установленного времени жизни."""
     now = datetime.now()
-    for folder in ["static/images"]:
+    for folder in ["static/images", "static/stl"]:
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
             if os.path.isfile(file_path):
                 file_time = datetime.fromtimestamp(os.path.getmtime(file_path))
-                if now - file_time > timedelta(minutes=15):
+                if now - file_time > timedelta(minutes=3):
                     os.remove(file_path)
                     print(f"Deleted {filename}")
 
