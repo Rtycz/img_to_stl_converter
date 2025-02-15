@@ -11,7 +11,7 @@ import time
 import numpy as np
 from stl import mesh
 from PIL import Image
-import pyvista as pv
+import stl
 
 
 app = FastAPI()
@@ -112,49 +112,47 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     return processed_filename
 
 
-def convert_image_to_stl(image_path, filename, height_white=0, height_black=4, scale=1.0, target_reduction=0.5):
-    # Чтение изображения
-    image_array = np.array(Image.open(image_path))
+def convert_image_to_stl(image_path, processed_filename, scale_factor=0.5):
+    print(image_path, scale_factor)
+    # Загрузка изображения и уменьшение его размера
+    image = Image.open(image_path)
+    width, height = image.size
+    new_size = (int(width * scale_factor), int(height * scale_factor))
+    image = image.resize(new_size, Image.NEAREST)
+    image_array = np.array(image)
 
-    # Создание высотной карты
-    height_map = np.where(image_array == 255, height_white, height_black)
+    # Определение размеров изображения
+    height, width = image_array.shape
 
-    # Создание сетки
-    height, width = height_map.shape
+    # Создание сетки для 3D модели
     vertices = []
-
     for i in range(height):
         for j in range(width):
-            z = height_map[i, j]
-            vertices.append([j * scale, i * scale, z])
+            z = 10 if image_array[i, j] > 127 else 0  # Высота 10 мм для светлых пикселей, 0 мм для темных
+            vertices.append([j, i, z])
 
-    # Создание треугольников
+    # Создание треугольников для STL файла
     faces = []
     for i in range(height - 1):
         for j in range(width - 1):
-            v0 = i * width + j
-            v1 = v0 + 1
-            v2 = v0 + width
-            v3 = v2 + 1
-            faces.append([v0, v1, v2])
-            faces.append([v2, v1, v3])
+            v1 = i * width + j
+            v2 = v1 + 1
+            v3 = v1 + width
+            v4 = v3 + 1
+            faces.append([v1, v2, v3])
+            faces.append([v2, v4, v3])
 
-    # Создание STL-меша
-    faces = np.array(faces)
-    vertices = np.array(vertices)
+    # Создание STL меша
+    stl_mesh = mesh.Mesh(np.zeros(len(faces), dtype=mesh.Mesh.dtype))
+    for i, face in enumerate(faces):
+        for j in range(3):
+            stl_mesh.vectors[i][j] = vertices[face[j]]
 
-    # Создание PolyData объекта в pyvista
-    mesh = pv.PolyData(vertices, np.hstack([np.full((faces.shape[0], 1), 3), faces]))
+    # Сохранение STL файла в бинарном формате
+    output_filename = image_path.replace('.', '_processed.') + '.stl'
+    stl_mesh.save(output_filename, mode=stl.Mode.BINARY)
 
-    # Упрощение сетки
-    simplified_mesh = mesh.decimate(target_reduction)
-
-    # Сохранение упрощенного STL-файла
-    simplified_stl_path = f"{filename.split('.')[0]}_simplified.stl"
-    simplified_mesh.save(simplified_stl_path)
-
-    return simplified_stl_path
-
+    return output_filename
 
 
 def cleanup_old_files():
@@ -165,7 +163,7 @@ def cleanup_old_files():
             file_path = os.path.join(folder, filename)
             if os.path.isfile(file_path):
                 file_time = datetime.fromtimestamp(os.path.getmtime(file_path))
-                if now - file_time > timedelta(minutes=3):
+                if now - file_time > timedelta(minutes=15):
                     os.remove(file_path)
                     print(f"Deleted {filename}")
 
