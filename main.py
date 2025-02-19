@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from api.v1 import image, process, stl_convert, delete, forms
+from api.v1 import image, process, stl_convert, forms
 from processing.file_cleanup import start_cleanup_thread
 
 app = FastAPI()
@@ -17,7 +17,6 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(image.router)
 app.include_router(process.router)
 app.include_router(stl_convert.router)
-app.include_router(delete.router)
 app.include_router(forms.router)
 
 @app.on_event("startup")
