@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 import os
 from api.v1 import image, process, stl_convert, forms
 from processing.file_cleanup import start_cleanup_thread
+from contextlib import asynccontextmanager
 
 app = FastAPI()
 
@@ -19,9 +20,14 @@ app.include_router(process.router)
 app.include_router(stl_convert.router)
 app.include_router(forms.router)
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Код, который выполняется при старте приложения
     start_cleanup_thread()
+    yield
+    # Код, который выполняется при завершении работы приложения
+
+app.router.lifespan_context = lifespan
 
 if __name__ == "__main__":
     import uvicorn
