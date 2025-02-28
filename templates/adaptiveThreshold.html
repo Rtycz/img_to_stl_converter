@@ -4,56 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image to STL converter</title>
-    <!-- Подключение внешнего CSS-файла -->
+
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/buttons.css">
     <link rel="stylesheet" href="/static/css/images.css">
     <link rel="stylesheet" href="/static/css/form.css">
     <link rel="stylesheet" href="/static/css/responsive.css">
-    <!-- Подключение внешнего JavaScript-файла -->
+    <link rel="stylesheet" href="/static/css/tabs.css">
+
     <script src="/static/js/script.js" defer></script>
 </head>
 <body>
     <div>
         <h1>Image to STL converter</h1>
-        <input type="file" id="photoInput" name="photo" accept="image/*">
-        <div class="preview-container" id="preview">
-            <div class="loader" id="loader"></div>
-            <img id="previewImage" src="" alt="Image Preview">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'uploadTab')">Upload Image</button>
+            <button class="tab-button" onclick="openTab(event, 'processTab')">Process Image</button>
+            <button class="tab-button" onclick="openTab(event, 'convertTab')">Convert to STL</button>
         </div>
-        <div class="controls-container">
-            <div class="row">
-                <label>
-                    Threshold Type:
-                    <select id="thresholdType">
-                        <option value="THRESH_BINARY">Binary</option>
-                        <option value="THRESH_BINARY_INV">Binary Inverted</option>
-                    </select>
-                </label>
-                <label>
-                    Adaptive Method:
-                    <select id="adaptiveMethod">
-                        <option value="ADAPTIVE_THRESH_MEAN_C">Mean</option>
-                        <option value="ADAPTIVE_THRESH_GAUSSIAN_C">Gaussian</option>
-                    </select>
-                </label>
-            </div>
-            <div class="row">
-                <label>
-                    Max Value: <input type="range" id="maxValue" min="0" max="255" step="1" value="255">
-                </label>
-                <label>
-                    Block Size: <input type="range" id="blockSize" min="3" max="255" step="2" value="11">
-                </label>
-                <label>
-                    C: <input type="range" id="C" min="-10" max="10" step="1" value="2">
-                </label>
+
+        <div id="uploadTab" class="tab-content active">
+            <input type="file" id="photoInput" name="photo" accept="image/*">
+            <div class="preview-container" id="preview">
+                <div class="loader" id="loader"></div>
+                <img id="previewImage" src="" alt="Image Preview">
             </div>
         </div>
-        <button id="convertToStl">Convert to STL</button>
-        <div class="processed-image-container" id="processedImageContainer">
-            <img id="processedImage" src="" alt="Processed Image">
+
+        <div id="processTab" class="tab-content">
+            <!-- Пустая вкладка для обработки изображения -->
+        </div>
+
+        <div id="convertTab" class="tab-content">
+            <div class="controls-container">
+                <div class="row">
+                    <label>
+                        Threshold Type:
+                        <select id="thresholdType">
+                            <option value="THRESH_BINARY">Binary</option>
+                            <option value="THRESH_BINARY_INV">Binary Inverted</option>
+                        </select>
+                    </label>
+                    <label>
+                        Adaptive Method:
+                        <select id="adaptiveMethod">
+                            <option value="ADAPTIVE_THRESH_MEAN_C">Mean</option>
+                            <option value="ADAPTIVE_THRESH_GAUSSIAN_C">Gaussian</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>
+                        Max Value: <input type="range" id="maxValue" min="0" max="255" step="1" value="255">
+                    </label>
+                    <label>
+                        Block Size: <input type="range" id="blockSize" min="3" max="255" step="2" value="11">
+                    </label>
+                    <label>
+                        C: <input type="range" id="C" min="-10" max="10" step="1" value="2">
+                    </label>
+                </div>
+            </div>
+            <button id="convertToStl">Convert to STL</button>
+            <div class="processed-image-container" id="processedImageContainer">
+                <img id="processedImage" src="" alt="Processed Image">
+            </div>
         </div>
     </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabContent, tabButtons;
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].style.display = "none";
+            }
+            tabButtons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].className = tabButtons[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
 </body>
 </html>
