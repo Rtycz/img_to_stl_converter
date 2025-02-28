@@ -1,4 +1,5 @@
 let uploadedFilenames = [];
+let currentFilename = '';
 
 document.getElementById('photoInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -31,6 +32,7 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         }).then(response => response.json())
           .then(data => {
               uploadedFilenames.push(data.filename);
+              currentFilename = data.filename;
               updateProcessedImage(data.filename);
           }).catch(error => {
               console.error('Ошибка при загрузке фото:', error);
@@ -93,14 +95,12 @@ document.getElementById('blockSize').addEventListener('input', updateProcessedIm
 document.getElementById('C').addEventListener('input', updateProcessedImageWithCurrentFilename);
 
 function updateProcessedImageWithCurrentFilename() {
-    if (uploadedFilenames.length > 0) {
-        const currentFilename = uploadedFilenames[uploadedFilenames.length - 1];
+    if (currentFilename) {
         updateProcessedImage(currentFilename);
     }
 }
 
 document.getElementById('convertToStl').addEventListener('click', function() {
-    const filename = uploadedFilenames[uploadedFilenames.length - 1];
     const processedFilename = document.getElementById('processedImage').src.split('/').pop().split('?')[0];
 
     fetch('/api/v1/process/stl-convert', {
