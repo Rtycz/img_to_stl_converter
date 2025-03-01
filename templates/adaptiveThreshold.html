@@ -21,8 +21,18 @@
                 <span>Upload</span>
                 <span>Image</span>
             </button>
-            <button class="tab-button" onclick="openTab(event, 'processTab')">
+            <button class="tab-button" onclick="openTab(event, 'processMulticolourTab')">
                 <span>Process</span>
+                <span>Multicolour</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'discolourTab')">
+                <span>Discolour</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'processDiscolouredTab')">
+                <span>Process</span>
+                <span>Discoloured</span>
                 <span>Image</span>
             </button>
             <button class="tab-button" onclick="openTab(event, 'convertTab')">
@@ -42,11 +52,11 @@
             </div>
         </div>
 
-        <div id="processTab" class="tab-content">
-            <!-- Пустая вкладка для обработки изображения -->
+        <div id="processMulticolourTab" class="tab-content">
+            <!-- Пустая вкладка для обработки цветного изображения -->
         </div>
 
-        <div id="convertTab" class="tab-content">
+        <div id="discolourTab" class="tab-content">
             <div class="controls-container">
                 <div class="row">
                     <label>
@@ -76,10 +86,17 @@
                     </label>
                 </div>
             </div>
-            <button id="convertToStl">Convert to STL</button>
             <div class="processed-image-container" id="processedImageContainer">
                 <img id="processedImage" src="" alt="Processed Image">
             </div>
+        </div>
+
+        <div id="processDiscolouredTab" class="tab-content">
+            <!-- Пустая вкладка для обработки обесцвеченного изображения -->
+        </div>
+
+        <div id="convertTab" class="tab-content">
+            <button id="convertToStl">Convert to STL</button>
         </div>
     </div>
 

@@ -55,3 +55,31 @@
 .tab-content.active {
     display: block;
 }
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin-left: var(--header-width);
+}
+
+:root {
+    --header-width: auto;
+}
+
+.preview-container, .processed-image-container {
+    margin: 20px auto;
+    display: block;
+    position: relative;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.preview-container img, .processed-image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
