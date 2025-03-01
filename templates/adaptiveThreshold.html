@@ -15,19 +15,30 @@
     <script src="/static/js/script.js" defer></script>
 </head>
 <body>
-    <div>
-        <h1>Image to STL converter</h1>
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab(event, 'uploadTab')">Upload Image</button>
-            <button class="tab-button" onclick="openTab(event, 'processTab')">Process Image</button>
-            <button class="tab-button" onclick="openTab(event, 'convertTab')">Convert to STL</button>
+    <div class="header">
+        <div class="header-tabs">
+            <button class="tab-button active" onclick="openTab(event, 'uploadTab')">
+                <span>Upload</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'processTab')">
+                <span>Process</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'convertTab')">
+                <span>Convert</span>
+                <span>to</span>
+                <span>STL</span>
+            </button>
         </div>
+    </div>
 
+    <div class="content">
         <div id="uploadTab" class="tab-content active">
             <input type="file" id="photoInput" name="photo" accept="image/*">
             <div class="preview-container" id="preview">
                 <div class="loader" id="loader"></div>
-                <img id="previewImage" src="" alt="Image Preview">
+                <img id="previewImage" src="" alt="">
             </div>
         </div>
 
