@@ -13,3 +13,14 @@ def process_image(photo_path, filename, maxValue=255, adaptiveMethod="ADAPTIVE_T
     processed_path = os.path.join("static/images", processed_filename)
     cv2.imwrite(processed_path, processed_image)
     return processed_filename
+
+def apply_median_filter(photo_path, filename, kernelSize=3):
+    # Чтение изображения
+    image = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
+    # Применение медианного фильтра
+    processed_image = cv2.medianBlur(image, kernelSize)
+    # Сохранение обработанного изображения
+    processed_filename = f"{filename.split('.')[0]}_median_processed.png"
+    processed_path = os.path.join("static/images", processed_filename)
+    cv2.imwrite(processed_path, processed_image)
+    return processed_filename

@@ -1,5 +1,6 @@
 let uploadedFilenames = [];
 let currentFilename = '';
+let medianProcessedFilename = '';
 
 document.getElementById('photoInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -97,6 +98,7 @@ function updateProcessedImage(filename) {
           const processedImageContainer = document.getElementById('processedImageContainer');
           processedImage.src = `/static/images/${data.processed_filename}?t=${new Date().getTime()}`;
           processedImageContainer.style.display = 'block';
+          medianProcessedFilename = data.processed_filename;
       }).catch(error => {
           console.error('Ошибка при обработке изображения:', error);
       });
@@ -114,8 +116,34 @@ function updateProcessedImageWithCurrentFilename() {
     }
 }
 
+document.getElementById('medianKernelSize').addEventListener('input', updateMedianProcessedImage);
+
+function updateMedianProcessedImage() {
+    const kernelSize = document.getElementById('medianKernelSize').value;
+
+    fetch('/api/v1/process/median-filter', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            filename: medianProcessedFilename,
+            kernelSize
+        })
+    }).then(response => response.json())
+      .then(data => {
+          const medianProcessedImage = document.getElementById('medianProcessedImage');
+          const medianProcessedImageContainer = document.getElementById('medianProcessedImageContainer');
+          medianProcessedImage.src = `/static/images/${data.processed_filename}?t=${new Date().getTime()}`;
+          medianProcessedImageContainer.style.display = 'block';
+          medianProcessedFilename = data.processed_filename;
+      }).catch(error => {
+          console.error('Ошибка при обработке изображения медианным фильтром:', error);
+      });
+}
+
 document.getElementById('convertToStl').addEventListener('click', function() {
-    const processedFilename = document.getElementById('processedImage').src.split('/').pop().split('?')[0];
+    const processedFilename = document.getElementById('medianProcessedImage').src.split('/').pop().split('?')[0];
 
     fetch('/api/v1/process/stl-convert', {
         method: 'POST',
