@@ -116,7 +116,11 @@ function updateProcessedImageWithCurrentFilename() {
     }
 }
 
-document.getElementById('medianKernelSize').addEventListener('input', updateMedianProcessedImage);
+document.getElementById('medianKernelSize').addEventListener('input', function() {
+    const kernelSize = document.getElementById('medianKernelSize').value;
+    document.getElementById('medianKernelSizeValue').textContent = kernelSize;
+    updateMedianProcessedImage();
+});
 
 function updateMedianProcessedImage() {
     const kernelSize = document.getElementById('medianKernelSize').value;
