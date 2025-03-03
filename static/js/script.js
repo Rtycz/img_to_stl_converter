@@ -1,6 +1,5 @@
-// static/js/script.js
-
-let uploadedFilenames = []; // Список для хранения имен загруженных файлов
+let uploadedFilenames = [];
+let currentFilename = '';
 
 document.getElementById('photoInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -12,32 +11,28 @@ document.getElementById('photoInput').addEventListener('change', function(event)
         const processedImageContainer = document.getElementById('processedImageContainer');
         const processedImage = document.getElementById('processedImage');
 
-        // Показать индикатор загрузки
         loader.style.display = 'block';
         preview.style.display = 'block';
         previewImage.style.display = 'none';
         processedImageContainer.style.display = 'none';
 
         reader.onload = function(e) {
-            // Отображение превью изображения после загрузки
             previewImage.src = e.target.result;
             previewImage.style.display = 'block';
             loader.style.display = 'none';
         };
         reader.readAsDataURL(file);
 
-        // Создание объекта FormData и добавление файла
         const formData = new FormData();
         formData.append('file', file);
 
-        // Отправка файла на сервер с использованием fetch
         fetch('/api/v1/image', {
             method: 'POST',
             body: formData
         }).then(response => response.json())
           .then(data => {
-              uploadedFilenames.push(data.filename); // Добавление имени файла в список
-              // Отображение обработанного изображения
+              uploadedFilenames.push(data.filename);
+              currentFilename = data.filename;
               updateProcessedImage(data.filename);
           }).catch(error => {
               console.error('Ошибка при загрузке фото:', error);
@@ -45,10 +40,8 @@ document.getElementById('photoInput').addEventListener('change', function(event)
     }
 });
 
-// Обработчик события beforeunload для удаления всех файлов при закрытии вкладки
 window.addEventListener('beforeunload', function(event) {
     if (uploadedFilenames.length > 0) {
-        // Уведомление сервера об удалении всех файлов
         fetch('/api/v1/image', {
             method: 'DELETE',
             headers: {
@@ -64,7 +57,20 @@ window.addEventListener('beforeunload', function(event) {
     }
 });
 
-// Функция для обновления обработанного изображения
+function openTab(evt, tabName) {
+    var i, tabContent, tabButtons;
+    tabContent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+    tabButtons = document.getElementsByClassName("tab-button");
+    for (i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].className = tabButtons[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
 function updateProcessedImage(filename) {
     const maxValue = document.getElementById('maxValue').value;
     const adaptiveMethod = document.getElementById('adaptiveMethod').value;
@@ -96,7 +102,6 @@ function updateProcessedImage(filename) {
       });
 }
 
-// Обработчики изменения параметров
 document.getElementById('maxValue').addEventListener('input', updateProcessedImageWithCurrentFilename);
 document.getElementById('adaptiveMethod').addEventListener('change', updateProcessedImageWithCurrentFilename);
 document.getElementById('thresholdType').addEventListener('change', updateProcessedImageWithCurrentFilename);
@@ -104,14 +109,12 @@ document.getElementById('blockSize').addEventListener('input', updateProcessedIm
 document.getElementById('C').addEventListener('input', updateProcessedImageWithCurrentFilename);
 
 function updateProcessedImageWithCurrentFilename() {
-    if (uploadedFilenames.length > 0) {
-        const currentFilename = uploadedFilenames[uploadedFilenames.length - 1];
+    if (currentFilename) {
         updateProcessedImage(currentFilename);
     }
 }
 
 document.getElementById('convertToStl').addEventListener('click', function() {
-    const filename = uploadedFilenames[uploadedFilenames.length - 1];
     const processedFilename = document.getElementById('processedImage').src.split('/').pop().split('?')[0];
 
     fetch('/api/v1/process/stl-convert', {
@@ -119,7 +122,7 @@ document.getElementById('convertToStl').addEventListener('click', function() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ filename, processed_filename: processedFilename })
+        body: JSON.stringify({ processed_filename: processedFilename })
     }).then(response => response.json())
       .then(data => {
           alert('STL file generated: ' + data.stl_filename);

@@ -4,55 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image to STL converter</title>
-    <!-- Подключение внешнего CSS-файла -->
+
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/buttons.css">
     <link rel="stylesheet" href="/static/css/images.css">
     <link rel="stylesheet" href="/static/css/form.css">
     <link rel="stylesheet" href="/static/css/responsive.css">
-    <!-- Подключение внешнего JavaScript-файла -->
+    <link rel="stylesheet" href="/static/css/tabs.css">
+
     <script src="/static/js/script.js" defer></script>
 </head>
 <body>
-    <div>
-        <h1>Image to STL converter</h1>
-        <input type="file" id="photoInput" name="photo" accept="image/*">
-        <div class="preview-container" id="preview">
-            <div class="loader" id="loader"></div>
-            <img id="previewImage" src="" alt="Image Preview">
+    <div class="header">
+        <div class="header-tabs">
+            <button class="tab-button active" onclick="openTab(event, 'uploadTab')">
+                <span>Upload</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'processMulticolourTab')">
+                <span>Process</span>
+                <span>Multicolour</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'discolourTab')">
+                <span>Discolour</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'processDiscolouredTab')">
+                <span>Process</span>
+                <span>Discoloured</span>
+                <span>Image</span>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'convertTab')">
+                <span>Convert</span>
+                <span>to</span>
+                <span>STL</span>
+            </button>
         </div>
-        <div class="controls-container">
-            <div class="row">
-                <label>
-                    Threshold Type:
-                    <select id="thresholdType">
-                        <option value="THRESH_BINARY">Binary</option>
-                        <option value="THRESH_BINARY_INV">Binary Inverted</option>
-                    </select>
-                </label>
-                <label>
-                    Adaptive Method:
-                    <select id="adaptiveMethod">
-                        <option value="ADAPTIVE_THRESH_MEAN_C">Mean</option>
-                        <option value="ADAPTIVE_THRESH_GAUSSIAN_C">Gaussian</option>
-                    </select>
-                </label>
-            </div>
-            <div class="row">
-                <label>
-                    Max Value: <input type="range" id="maxValue" min="0" max="255" step="1" value="255">
-                </label>
-                <label>
-                    Block Size: <input type="range" id="blockSize" min="3" max="255" step="2" value="11">
-                </label>
-                <label>
-                    C: <input type="range" id="C" min="-10" max="10" step="1" value="2">
-                </label>
+    </div>
+
+    <div class="content">
+        <div id="uploadTab" class="tab-content active">
+            <input type="file" id="photoInput" name="photo" accept="image/*">
+            <div class="preview-container" id="preview">
+                <div class="loader" id="loader"></div>
+                <img id="previewImage" src="" alt="">
             </div>
         </div>
-        <button id="convertToStl">Convert to STL</button>
-        <div class="processed-image-container" id="processedImageContainer">
-            <img id="processedImage" src="" alt="Processed Image">
+
+        <div id="processMulticolourTab" class="tab-content">
+            <!-- Пустая вкладка для обработки цветного изображения -->
+        </div>
+
+        <div id="discolourTab" class="tab-content">
+            <div class="controls-container">
+                <div class="row">
+                    <label>
+                        Threshold Type:
+                        <select id="thresholdType">
+                            <option value="THRESH_BINARY">Binary</option>
+                            <option value="THRESH_BINARY_INV">Binary Inverted</option>
+                        </select>
+                    </label>
+                    <label>
+                        Adaptive Method:
+                        <select id="adaptiveMethod">
+                            <option value="ADAPTIVE_THRESH_MEAN_C">Mean</option>
+                            <option value="ADAPTIVE_THRESH_GAUSSIAN_C">Gaussian</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>
+                        Max Value: <input type="range" id="maxValue" min="0" max="255" step="1" value="255">
+                    </label>
+                    <label>
+                        Block Size: <input type="range" id="blockSize" min="3" max="255" step="2" value="11">
+                    </label>
+                    <label>
+                        C: <input type="range" id="C" min="-10" max="10" step="1" value="2">
+                    </label>
+                </div>
+            </div>
+            <div class="processed-image-container" id="processedImageContainer">
+                <img id="processedImage" src="" alt="Processed Image">
+            </div>
+        </div>
+
+        <div id="processDiscolouredTab" class="tab-content">
+            <!-- Пустая вкладка для обработки обесцвеченного изображения -->
+        </div>
+
+        <div id="convertTab" class="tab-content">
+            <button id="convertToStl">Convert to STL</button>
         </div>
     </div>
 </body>
